@@ -25,16 +25,16 @@ CREATE TABLE finanzas (
 CREATE TABLE vendedor (
     id_vendedor INT NOT NULL,
     cuota_ventas DECIMAL(10,2) NOT NULL,
-    
+
     CONSTRAINT id_vendedor_vendedor_indx PRIMARY KEY NONCLUSTERED (id_vendedor) ON [FG_Indices],
     CONSTRAINT fk_vendedor_persona FOREIGN KEY (id_vendedor) REFERENCES persona(id_persona)
 ) ON [FG_Tablas];
 
 CREATE TABLE supervisor (
-    id_supervisor INT NOT NULL, 
+    id_supervisor INT NOT NULL,
     zona VARCHAR(50) NOT NULL,
     id_supervisor_jefe INT,
-    
+
     CONSTRAINT id_supervisor_supervisor_indx PRIMARY KEY NONCLUSTERED (id_supervisor) ON [FG_Indices],
     CONSTRAINT fk_supervisor_persona FOREIGN KEY (id_supervisor) REFERENCES persona(id_persona),
     CONSTRAINT fk_jefe FOREIGN KEY (id_supervisor_jefe) REFERENCES supervisor(id_supervisor)
@@ -46,7 +46,7 @@ CREATE TABLE historial_asignacion (
     id_supervisor INT NOT NULL,
     fecha_hasta DATE,
     porcentaje_reconocimiento DECIMAL(5,2) NOT NULL,
-    
+
     CONSTRAINT id_vendedor_fecha_desde_historial_asignacion_indx PRIMARY KEY NONCLUSTERED (id_vendedor, fecha_desde) ON [FG_Indices],
     CONSTRAINT fk_historial_vendedor FOREIGN KEY (id_vendedor) REFERENCES vendedor(id_vendedor),
     CONSTRAINT fk_historial_supervisor FOREIGN KEY (id_supervisor) REFERENCES supervisor(id_supervisor)
@@ -94,7 +94,7 @@ CREATE TABLE detalle_factura (
     cantidad INT NOT NULL,
     monto DECIMAL(12,2) NOT NULL,
     motivo VARCHAR(100) NOT NULL,
-    
+
     CONSTRAINT numero_factura_codigo_producto_detalle_factura_indx PRIMARY KEY NONCLUSTERED (numero_factura, codigo_producto) ON [FG_Indices],
     CONSTRAINT fk_detalle_factura FOREIGN KEY (numero_factura) REFERENCES factura(numero),
     CONSTRAINT fk_detalle_producto FOREIGN KEY (codigo_producto) REFERENCES producto(codigo)
@@ -105,7 +105,7 @@ CREATE TABLE participacion_factura (
     id_vendedor INT NOT NULL,
     id_rol INT NOT NULL,
     porcentaje DECIMAL(5,2) NOT NULL,
-    
+
     CONSTRAINT numero_factura_id_vendedor_id_rol_participacion_factura_indx PRIMARY KEY NONCLUSTERED (numero_factura, id_vendedor, id_rol) ON [FG_Indices],
     CONSTRAINT fk_participacion_factura FOREIGN KEY (numero_factura) REFERENCES factura(numero),
     CONSTRAINT fk_participacion_vendedor FOREIGN KEY (id_vendedor) REFERENCES vendedor(id_vendedor),
@@ -118,7 +118,7 @@ CREATE TABLE plan_comision (
     tasa DECIMAL(5,2) NOT NULL,
     base VARCHAR(20) NOT NULL,
     admite_descuentos BIT NOT NULL, -- (1 admite retraer la comisión, 0 si no)
-    
+
     CONSTRAINT codigo_plan_comision_indx PRIMARY KEY NONCLUSTERED (codigo) ON [FG_Indices],
     CONSTRAINT chk_base_plan CHECK (base IN ('ingreso', 'margen', 'cantidad'))
 ) ON [FG_Tablas];
@@ -129,7 +129,7 @@ CREATE TABLE asignacion_plan_vendedor (
     fecha_desde DATE NOT NULL,
     id_plan INT NOT NULL,
     -- Capaz se puede agregar fecha_hasta
-    
+
     CONSTRAINT id_vendedor_id_rol_fecha_desde_asignacion_plan_vendedor_indx PRIMARY KEY NONCLUSTERED (id_vendedor, id_rol, fecha_desde) ON [FG_Indices],
     CONSTRAINT fk_asignacion_vendedor FOREIGN KEY (id_vendedor) REFERENCES vendedor(id_vendedor),
     CONSTRAINT fk_asignacion_rol FOREIGN KEY (id_rol) REFERENCES rol_venta(id_rol),
@@ -143,19 +143,19 @@ CREATE TABLE periodo (
     tipo_periodo VARCHAR(15) NOT NULL,
     fecha_inicio DATE NOT NULL,
     fecha_cierre DATE NOT NULL,
-    
+
     CONSTRAINT id_periodo_periodo_indx PRIMARY KEY NONCLUSTERED (id_periodo) ON [FG_Indices],
     CONSTRAINT chk_tipo_periodo CHECK (tipo_periodo IN ('semanal', 'mensual', 'trimestral', 'anual')),
     CONSTRAINT chk_fechas_logicas CHECK (fecha_cierre >= fecha_inicio)
 ) ON [FG_Tablas];
 
-CREATE TABLE calculo_comision (
+CREATE TABLE trg_calculo_comision (
     id_periodo INT NOT NULL,
     id_persona INT NOT NULL,
     monto_ventas_propias DECIMAL(12,2) NOT NULL DEFAULT 0,
     monto_supervision DECIMAL(12,2) NOT NULL DEFAULT 0,
     estado VARCHAR(20) NOT NULL,
-    
+
     CONSTRAINT id_periodo_id_persona_calculo_comision_indx PRIMARY KEY NONCLUSTERED (id_periodo, id_persona) ON [FG_Indices],
     CONSTRAINT fk_calculo_periodo FOREIGN KEY (id_periodo) REFERENCES periodo(id_periodo),
     CONSTRAINT fk_calculo_persona FOREIGN KEY (id_persona) REFERENCES persona(id_persona)

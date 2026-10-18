@@ -149,7 +149,7 @@ CREATE TABLE periodo (
     CONSTRAINT chk_fechas_logicas CHECK (fecha_cierre >= fecha_inicio)
 ) ON [FG_Tablas];
 
-CREATE TABLE trg_calculo_comision (
+CREATE TABLE calculo_comision (
     id_periodo INT NOT NULL,
     id_persona INT NOT NULL,
     monto_ventas_propias DECIMAL(12,2) NOT NULL DEFAULT 0,

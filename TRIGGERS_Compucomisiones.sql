@@ -58,7 +58,8 @@ BEGIN
         RETURN;
     END
 
-    IF EXISTS (
+    DECLARE @hay_ciclo BIT = 0;
+
         WITH linea_de_mando AS (
             SELECT
                 i.id_supervisor,
@@ -82,15 +83,16 @@ BEGIN
             INNER JOIN linea_de_mando AS lm ON lm.id_supervisor_jefe = padre.id_supervisor
             WHERE lm.tiene_ciclo = 0
         )
-        SELECT 1
+        SELECT TOP 1 @hay_ciclo = 1
         FROM linea_de_mando
-        WHERE tiene_ciclo = 1
-    )
-    BEGIN
-        RAISERROR ('Operación cancelada: Se detectó una dependencia circular en la jerarquía de supervisores.', 16, 1);
-        ROLLBACK TRANSACTION;
-        RETURN;
-    END
+        WHERE tiene_ciclo = 1;
+
+        IF @hay_ciclo = 1
+        BEGIN
+            RAISERROR ('Operación cancelada: Se detectó una dependencia circular en la jerarquía de supervisores.', 16, 1);
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END;
 END;
 GO
 

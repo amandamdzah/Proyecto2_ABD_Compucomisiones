@@ -412,7 +412,7 @@ INSERT INTO calculo_comision (id_periodo, id_persona, monto_ventas_propias, mont
 (3, 21, 36.00, 0.00, 'pagado'),
 (3, 22, 94.73, 0.00, 'pagado'),
 (3, 23, 36.12, 0.00, 'pagado'),
-(3, 24, 39.90, 0.00, 'calculado'),
+(3, 24, 39.90, 0.00, 'retenido'),
 (3, 25, 38.25, 0.00, 'pagado');
 GO
 

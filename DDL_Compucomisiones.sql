@@ -8,10 +8,9 @@ CREATE TABLE persona (
     correo VARCHAR(50) NOT NULL,
     creado_en DATETIMEOFFSET NOT NULL,
     estado BIT NOT NULL, -- (1 Activo, 0 inactivo)
-    tipo_rol VARCHAR(15) NOT NULL,
+    tipo_rol VARCHAR(50) NOT NULL,
 
-    CONSTRAINT id_persona_persona_indx PRIMARY KEY NONCLUSTERED (id_persona) ON [FG_Indices],
-    CONSTRAINT chk_tipo_rol CHECK (tipo_rol IN ('Vendedor', 'Supervisor', 'Finanzas'))
+    CONSTRAINT id_persona_persona_indx PRIMARY KEY NONCLUSTERED (id_persona) ON [FG_Indices]
 ) ON [FG_Tablas];
 
 CREATE TABLE finanzas (

@@ -307,6 +307,27 @@ INSERT INTO plan_comision (codigo, nombre, tasa, base, admite_descuentos) VALUES
 (10, 'Promoción de periféricos', 4, 'ingreso', 1);
 GO
 
+--FILTROS DE LOS PLANES
+INSERT INTO filtro_plan (id_plan, orden, tipo_filtro, codigo_producto, categoria, motivo) VALUES
+(1, 1, 'categoria', NULL, 'Laptops', NULL),
+(1, 2, 'categoria', NULL, 'Equipos de escritorio', NULL),
+(1, 3, 'categoria', NULL, 'Servidores', NULL),
+(3, 1, 'categoria', NULL, 'Servidores', NULL),
+(3, 2, 'categoria', NULL, 'Redes y seguridad', NULL),
+(3, 3, 'categoria', NULL, 'Almacenamiento', NULL),
+(4, 1, 'categoria', NULL, 'Laptops', NULL),
+(5, 1, 'motivo', NULL, NULL, 'Renovación'),
+(5, 2, 'motivo', NULL, NULL, 'Expansión de licencias'),
+(5, 3, 'motivo', NULL, NULL, 'Actualización tecnológica'),
+(6, 1, 'categoria', NULL, 'Servidores', NULL),
+(6, 2, 'categoria', NULL, 'Redes y seguridad', NULL),
+(7, 1, 'motivo', NULL, NULL, 'Licitación pública'),
+(8, 1, 'categoria', NULL, 'Licencias de software', NULL),
+(9, 1, 'producto', 1001, NULL, NULL),
+(10, 1, 'categoria', NULL, 'Periféricos', NULL),
+(10, 2, 'motivo', NULL, NULL, 'Promoción de temporada');
+GO
+
 --ASIGNACION DE PLANES
 INSERT INTO asignacion_plan_vendedor (id_vendedor, id_rol, fecha_desde, id_plan) VALUES
 (11, 1, '2026-01-05', 2),

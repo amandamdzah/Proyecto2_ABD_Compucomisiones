@@ -3,7 +3,7 @@ GO
 
 
 --PERSONAS
-INSERT INTO persona (id_persona, nombre, apellidos, correo, creado_en, estado, tipo_rol) VALUES
+INSERT INTO comisiones_schema.persona (id_persona, nombre, apellidos, correo, creado_en, estado, tipo_rol) VALUES
 (1, 'Ricardo', 'Alfonzo Medina', 'ralfonzo@correo.com', '2018-03-12 10:45:00 -04:00', 1, 'Supervisor'),
 (2, 'Mariela', 'Contreras Rivas', 'mcontreras@correo.com', '2019-01-14 08:30:00 -04:00', 1, 'Supervisor'),
 (3, 'José Gregorio', 'Salas Uzcátegui', 'jsalas@correo.com', '2019-06-03 15:20:00 -04:00', 1, 'Supervisor'),
@@ -42,7 +42,7 @@ INSERT INTO persona (id_persona, nombre, apellidos, correo, creado_en, estado, t
 GO
 
 --SUPERVISORES
-INSERT INTO supervisor (id_supervisor, zona, id_supervisor_jefe) VALUES
+INSERT INTO comisiones_schema.supervisor (id_supervisor, zona, id_supervisor_jefe) VALUES
 (1, 'Caracas', NULL),
 (2, 'Miranda', 1),
 (3, 'Carabobo', 1),
@@ -56,7 +56,7 @@ INSERT INTO supervisor (id_supervisor, zona, id_supervisor_jefe) VALUES
 GO
 
 --VENDEDORES
-INSERT INTO vendedor (id_vendedor, cuota_ventas) VALUES
+INSERT INTO comisiones_schema.vendedor (id_vendedor, cuota_ventas) VALUES
 (11, 45000),
 (12, 40000),
 (13, 35000),
@@ -75,7 +75,7 @@ INSERT INTO vendedor (id_vendedor, cuota_ventas) VALUES
 GO
 
 --FINANZAS
-INSERT INTO finanzas (id_finanzas, cargo) VALUES
+INSERT INTO comisiones_schema.finanzas (id_finanzas, cargo) VALUES
 (26, 'Gerente'),
 (27, 'Coordinador'),
 (28, 'Analista'),
@@ -89,7 +89,7 @@ INSERT INTO finanzas (id_finanzas, cargo) VALUES
 GO
 
 --HISTORIAL DE ASIGNACION
-INSERT INTO historial_asignacion (id_vendedor, fecha_desde, id_supervisor, fecha_hasta, porcentaje_reconocimiento) VALUES
+INSERT INTO comisiones_schema.historial_asignacion (id_vendedor, fecha_desde, id_supervisor, fecha_hasta, porcentaje_reconocimiento) VALUES
 (11, '2022-02-14', 6, '2026-06-30', 7),
 (11, '2026-07-01', 6, NULL, 8),
 (12, '2022-06-20', 6, NULL, 8),
@@ -110,7 +110,7 @@ INSERT INTO historial_asignacion (id_vendedor, fecha_desde, id_supervisor, fecha
 GO
 
 --CLIENTES
-INSERT INTO cliente (codigo, nombre, segmento) VALUES
+INSERT INTO comisiones_schema.cliente (codigo, nombre, segmento) VALUES
 (1001, 'Corporación Agroindustrial del Tuy, C.A.', 'Corporativo'),
 (1002, 'Clínica Los Samanes, C.A.', 'Salud'),
 (1003, 'Unidad Educativa Nuevo Horizonte', 'Educación'),
@@ -126,7 +126,7 @@ INSERT INTO cliente (codigo, nombre, segmento) VALUES
 GO
 
 --PRODUCTOS
-INSERT INTO producto (codigo, nombre, categoria) VALUES
+INSERT INTO comisiones_schema.producto (codigo, nombre, categoria) VALUES
 (101, 'Laptop Lenovo ThinkPad E14 Gen 5', 'Laptops'),
 (102, 'Laptop HP ProBook 450 G10', 'Laptops'),
 (201, 'Desktop Dell OptiPlex 7010', 'Equipos de escritorio'),
@@ -145,7 +145,7 @@ INSERT INTO producto (codigo, nombre, categoria) VALUES
 GO
 
 --ROLES
-INSERT INTO rol_venta (id_rol, nombre, descripcion) VALUES
+INSERT INTO comisiones_schema.rol_venta (id_rol, nombre, descripcion) VALUES
 (1, 'Originador', 'Consigue el cliente y abre el negocio'),
 (2, 'Cerrador', 'Negocia y cierra la venta'),
 (3, 'Gestor de cuenta', 'Atiende la cuenta del cliente'),
@@ -159,7 +159,7 @@ INSERT INTO rol_venta (id_rol, nombre, descripcion) VALUES
 GO
 
 --FACTURAS
-INSERT INTO factura (numero, fecha_emision, situacion, fecha_cobro, codigo_cliente) VALUES
+INSERT INTO comisiones_schema.factura (numero, fecha_emision, situacion, fecha_cobro, codigo_cliente) VALUES
 (26001, '2026-07-02 09:15:00 -04:00', 'cobrada', '2026-07-10 16:15:00 -04:00', 1001),
 (26002, '2026-07-03 10:40:00 -04:00', 'cobrada', '2026-07-15 10:45:00 -04:00', 1002),
 (26003, '2026-07-06 08:30:00 -04:00', 'cobrada', '2026-07-28 13:25:00 -04:00', 1004),
@@ -186,63 +186,63 @@ INSERT INTO factura (numero, fecha_emision, situacion, fecha_cobro, codigo_clien
 GO
 
 --DETALLE FACTURA
-INSERT INTO detalle_factura (numero_factura, codigo_producto, cantidad, monto, motivo) VALUES
-(26001, 101, 20, 17000, 'Actualización tecnológica'),
-(26001, 601, 20, 3300, 'Actualización tecnológica'),
-(26002, 301, 1, 6800, 'Venta nueva'),
-(26002, 401, 2, 2900, 'Venta nueva'),
-(26002, 501, 1, 1100, 'Venta nueva'),
-(26002, 1001, 1, 2400, 'Venta nueva'),
-(26003, 201, 30, 23400, 'Licitación pública'),
-(26003, 701, 5, 2100, 'Licitación pública'),
-(26004, 601, 4, 660, 'Promoción de temporada'),
-(26004, 602, 4, 128, 'Promoción de temporada'),
-(26004, 801, 2, 520, 'Promoción de temporada'),
-(26005, 901, 40, 6000, 'Expansión de licencias'),
-(26006, 102, 15, 13800, 'Dotación de sede nueva'),
-(26006, 701, 2, 840, 'Dotación de sede nueva'),
-(26006, 801, 3, 780, 'Dotación de sede nueva'),
-(26007, 202, 3, 2850, 'Venta nueva'),
-(26007, 602, 3, 96, 'Venta nueva'),
-(26008, 302, 2, 17800, 'Proyecto llave en mano'),
-(26008, 402, 2, 2400, 'Proyecto llave en mano'),
-(26008, 501, 2, 2200, 'Proyecto llave en mano'),
-(26008, 1001, 1, 2400, 'Proyecto llave en mano'),
-(26009, 101, 10, 8500, 'Renovación'),
-(26009, 901, 60, 9000, 'Renovación'),
-(26010, 102, 25, 23000, 'Licitación pública'),
-(26010, 201, 10, 7800, 'Licitación pública'),
-(26010, 401, 4, 5800, 'Licitación pública'),
-(26011, 601, 10, 1650, 'Promoción de temporada'),
-(26011, 602, 10, 320, 'Promoción de temporada'),
-(26011, 701, 3, 1260, 'Promoción de temporada'),
-(26012, 301, 1, 6800, 'Venta nueva'),
-(26012, 1001, 1, 2400, 'Venta nueva'),
-(26012, 801, 2, 520, 'Venta nueva'),
-(26013, 901, 80, 12000, 'Expansión de licencias'),
-(26014, 202, 2, 1900, 'Actualización tecnológica'),
-(26015, 101, 12, 10200, 'Venta nueva'),
-(26015, 601, 12, 1980, 'Venta nueva'),
-(26016, 402, 3, 3600, 'Venta cruzada'),
-(26016, 501, 1, 1100, 'Venta cruzada'),
-(26016, 1001, 1, 2400, 'Venta cruzada'),
-(26017, 102, 8, 7360, 'Actualización tecnológica'),
-(26017, 201, 6, 4680, 'Actualización tecnológica'),
-(26018, 302, 1, 8900, 'Venta nueva'),
-(26018, 401, 1, 1450, 'Venta nueva'),
-(26018, 1001, 1, 2400, 'Venta nueva'),
-(26019, 202, 2, 1900, 'Cliente referido'),
-(26019, 701, 4, 1680, 'Cliente referido'),
-(26019, 801, 4, 1040, 'Cliente referido'),
-(26019, 602, 6, 192, 'Cliente referido'),
-(26020, 901, 15, 2250, 'Venta nueva'),
-(26021, 1001, 2, 4800, 'Renovación'),
-(26022, 101, 6, 5100, 'Venta nueva'),
-(26023, 401, 6, 8700, 'Licitación pública');
+INSERT INTO comisiones_schema.detalle_factura (numero_factura, codigo_producto, cantidad, monto, costo, motivo) VALUES
+(26001, 101, 20, 17000, 13600, 'Actualización tecnológica'),
+(26001, 601, 20, 3300, 2400, 'Actualización tecnológica'),
+(26002, 301, 1, 6800, 5400, 'Venta nueva'),
+(26002, 401, 2, 2900, 2200, 'Venta nueva'),
+(26002, 501, 1, 1100, 860, 'Venta nueva'),
+(26002, 1001, 1, 2400, 1300, 'Venta nueva'),
+(26003, 201, 30, 23400, 18300, 'Licitación pública'),
+(26003, 701, 5, 2100, 1650, 'Licitación pública'),
+(26004, 601, 4, 660, 480, 'Promoción de temporada'),
+(26004, 602, 4, 128, 84, 'Promoción de temporada'),
+(26004, 801, 2, 520, 390, 'Promoción de temporada'),
+(26005, 901, 40, 6000, 4800, 'Expansión de licencias'),
+(26006, 102, 15, 13800, 11025, 'Dotación de sede nueva'),
+(26006, 701, 2, 840, 660, 'Dotación de sede nueva'),
+(26006, 801, 3, 780, 585, 'Dotación de sede nueva'),
+(26007, 202, 3, 2850, 2280, 'Venta nueva'),
+(26007, 602, 3, 96, 63, 'Venta nueva'),
+(26008, 302, 2, 17800, 14400, 'Proyecto llave en mano'),
+(26008, 402, 2, 2400, 1800, 'Proyecto llave en mano'),
+(26008, 501, 2, 2200, 1720, 'Proyecto llave en mano'),
+(26008, 1001, 1, 2400, 1300, 'Proyecto llave en mano'),
+(26009, 101, 10, 8500, 6800, 'Renovación'),
+(26009, 901, 60, 9000, 7200, 'Renovación'),
+(26010, 102, 25, 23000, 18375, 'Licitación pública'),
+(26010, 201, 10, 7800, 6100, 'Licitación pública'),
+(26010, 401, 4, 5800, 4400, 'Licitación pública'),
+(26011, 601, 10, 1650, 1200, 'Promoción de temporada'),
+(26011, 602, 10, 320, 210, 'Promoción de temporada'),
+(26011, 701, 3, 1260, 990, 'Promoción de temporada'),
+(26012, 301, 1, 6800, 5400, 'Venta nueva'),
+(26012, 1001, 1, 2400, 1300, 'Venta nueva'),
+(26012, 801, 2, 520, 390, 'Venta nueva'),
+(26013, 901, 80, 12000, 9600, 'Expansión de licencias'),
+(26014, 202, 2, 1900, 1520, 'Actualización tecnológica'),
+(26015, 101, 12, 10200, 8160, 'Venta nueva'),
+(26015, 601, 12, 1980, 1440, 'Venta nueva'),
+(26016, 402, 3, 3600, 2700, 'Venta cruzada'),
+(26016, 501, 1, 1100, 860, 'Venta cruzada'),
+(26016, 1001, 1, 2400, 1300, 'Venta cruzada'),
+(26017, 102, 8, 7360, 5880, 'Actualización tecnológica'),
+(26017, 201, 6, 4680, 3660, 'Actualización tecnológica'),
+(26018, 302, 1, 8900, 7200, 'Venta nueva'),
+(26018, 401, 1, 1450, 1100, 'Venta nueva'),
+(26018, 1001, 1, 2400, 1300, 'Venta nueva'),
+(26019, 202, 2, 1900, 1520, 'Cliente referido'),
+(26019, 701, 4, 1680, 1320, 'Cliente referido'),
+(26019, 801, 4, 1040, 780, 'Cliente referido'),
+(26019, 602, 6, 192, 126, 'Cliente referido'),
+(26020, 901, 15, 2250, 1800, 'Venta nueva'),
+(26021, 1001, 2, 4800, 2600, 'Renovación'),
+(26022, 101, 6, 5100, 4080, 'Venta nueva'),
+(26023, 401, 6, 8700, 6600, 'Licitación pública');
 GO
 
 --PARTICIPACION
-INSERT INTO participacion_factura (numero_factura, id_vendedor, id_rol, porcentaje) VALUES
+INSERT INTO comisiones_schema.participacion_factura (numero_factura, id_vendedor, id_rol, porcentaje) VALUES
 (26001, 11, 1, 30),
 (26001, 11, 2, 40),
 (26001, 13, 3, 30),
@@ -294,7 +294,7 @@ INSERT INTO participacion_factura (numero_factura, id_vendedor, id_rol, porcenta
 GO
 
 --PLANES
-INSERT INTO plan_comision (codigo, nombre, tasa, base, admite_descuentos) VALUES
+INSERT INTO comisiones_schema.plan_comision (codigo, nombre, tasa, base, admite_descuentos) VALUES
 (1, 'Cierre de hardware', 3, 'ingreso', 1),
 (2, 'Originación general', 1.5, 'ingreso', 1),
 (3, 'Margen de soluciones de infraestructura', 8, 'margen', 1),
@@ -308,7 +308,7 @@ INSERT INTO plan_comision (codigo, nombre, tasa, base, admite_descuentos) VALUES
 GO
 
 --FILTROS DE LOS PLANES
-INSERT INTO filtro_plan (id_plan, orden, tipo_filtro, codigo_producto, categoria, motivo) VALUES
+INSERT INTO comisiones_schema.filtro_plan (id_plan, orden, tipo_filtro, codigo_producto, categoria, motivo) VALUES
 (1, 1, 'categoria', NULL, 'Laptops', NULL),
 (1, 2, 'categoria', NULL, 'Equipos de escritorio', NULL),
 (1, 3, 'categoria', NULL, 'Servidores', NULL),
@@ -329,7 +329,7 @@ INSERT INTO filtro_plan (id_plan, orden, tipo_filtro, codigo_producto, categoria
 GO
 
 --ASIGNACION DE PLANES
-INSERT INTO asignacion_plan_vendedor (id_vendedor, id_rol, fecha_desde, id_plan) VALUES
+INSERT INTO comisiones_schema.asignacion_plan_vendedor (id_vendedor, id_rol, fecha_desde, id_plan) VALUES
 (11, 1, '2026-01-05', 2),
 (11, 2, '2026-01-05', 1),
 (12, 2, '2025-03-01', 2),
@@ -352,7 +352,7 @@ INSERT INTO asignacion_plan_vendedor (id_vendedor, id_rol, fecha_desde, id_plan)
 GO
 
 --PERIODOS
-INSERT INTO periodo (id_periodo, descripcion, notas, tipo_periodo, fecha_inicio, fecha_cierre) VALUES
+INSERT INTO comisiones_schema.periodo (id_periodo, descripcion, notas, tipo_periodo, fecha_inicio, fecha_cierre) VALUES
 (1, 'Julio 2026', 'Primer mes en la plataforma', 'mensual', '2026-07-01', '2026-07-31'),
 (2, 'Agosto 2026', NULL, 'mensual', '2026-08-01', '2026-08-31'),
 (3, 'Septiembre 2026', 'Cierre de trimestre', 'mensual', '2026-09-01', '2026-09-30'),
@@ -368,7 +368,7 @@ INSERT INTO periodo (id_periodo, descripcion, notas, tipo_periodo, fecha_inicio,
 GO
 
 --CALCULO DE COMISIONES
-INSERT INTO calculo_comision (id_periodo, id_persona, monto_ventas_propias, monto_supervision, estado) VALUES
+INSERT INTO comisiones_schema.calculo_comision (id_periodo, id_persona, monto_ventas_propias, monto_supervision, estado) VALUES
 (1, 1, 0.00, 19.13, 'pagado'),
 (1, 2, 0.00, 0.53, 'pagado'),
 (1, 5, 0.00, 4.16, 'pagado'),
@@ -438,7 +438,7 @@ INSERT INTO calculo_comision (id_periodo, id_persona, monto_ventas_propias, mont
 GO
 
 --PAGOS
-INSERT INTO pago (id_pago, id_periodo, id_persona, fecha, monto, estado) VALUES
+INSERT INTO comisiones_schema.pago (id_pago, id_periodo, id_persona, fecha, monto, estado) VALUES
 (1, 2, 1, '2026-08-07', 19.13, 'pagado'),
 (2, 2, 2, '2026-08-07', 0.53, 'pagado'),
 (3, 2, 5, '2026-08-07', 4.16, 'pagado'),
@@ -505,7 +505,7 @@ INSERT INTO pago (id_pago, id_periodo, id_persona, fecha, monto, estado) VALUES
 (64, 4, 25, '2026-10-09', 38.25, 'pagado');
 GO
 
---CARLOS RAMIREZ SE RETIRA
-UPDATE persona SET estado = 0 WHERE id_persona = 24;
+--VENDEDOR QUE SE RETIRA
+UPDATE comisiones_schema.persona SET estado = 0 WHERE id_persona = 24;
 GO
 

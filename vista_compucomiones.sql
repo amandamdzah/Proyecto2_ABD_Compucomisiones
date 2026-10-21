@@ -1,7 +1,7 @@
 USE COMPUCOMISIONES;
 GO
 
-CREATE OR ALTER VIEW vw_reporte_pagos AS
+CREATE OR ALTER VIEW comisiones_schema.vw_reporte_pagos AS
 SELECT 
     p.id_pago,
     p.fecha AS fecha_pago,
@@ -12,7 +12,7 @@ SELECT
     per_reporte.tipo_periodo,
     per_reporte.fecha_inicio AS inicio_periodo_reporte,
     per_reporte.fecha_cierre AS cierre_periodo_reporte,
-    p.id_periodo AS id_periodo_calculo,
+    p.id_periodo AS id_periodo_pago,
     pers.id_persona,
     pers.nombre AS nombre_persona,
     pers.apellidos AS apellidos_persona,
@@ -23,4 +23,4 @@ INNER JOIN persona pers ON p.id_persona = pers.id_persona
 INNER JOIN periodo per_reporte ON p.fecha BETWEEN per_reporte.fecha_inicio AND per_reporte.fecha_cierre;
 GO
 --prueba para perio do mensual
-SELECT * FROM vw_reporte_pagos WHERE tipo_periodo = 'mensual';
+SELECT * FROM comisiones_schema.vw_reporte_pagos WHERE tipo_periodo = 'mensual';

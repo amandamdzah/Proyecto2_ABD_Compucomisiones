@@ -1,3 +1,6 @@
+USE COMPUCOMISIONES;
+GO
+
 -- 1. Control de la participación en la factura: sobre el registro de las participaciones, debe
 -- garantizar que la suma de los porcentajes de participación de los vendedores de una
 -- misma factura nunca supere el 100%, rechazando toda inserción o modificación que
@@ -5,8 +8,8 @@
 
 -- participacion_factura(numero_factura: INT, id_vendedor: INT, id_rol: INT, porcentaje: DECIMAL(5,2))
 
-CREATE OR ALTER TRIGGER pct_participacion_factura
-ON participacion_factura
+CREATE OR ALTER TRIGGER comisiones_schema.pct_participacion_factura
+ON comisiones_schema.participacion_factura
 AFTER INSERT, UPDATE
 AS
 BEGIN
@@ -37,8 +40,8 @@ GO
 
 -- supervisor(id_supervisor: INT, zona: VARCHAR(50), id_supervisor_jefe: INT)
 
-CREATE OR ALTER TRIGGER trg_supervisor_evitar_ciclo
-ON supervisor
+CREATE OR ALTER TRIGGER comisiones_schema.trg_supervisor_evitar_ciclo
+ON comisiones_schema.supervisor
 AFTER INSERT, UPDATE
 AS
 BEGIN
@@ -100,8 +103,8 @@ GO
 -- cual se reconoció la comisión admite descuentos, debe retraer del cálculo de comisiones
 -- la parte que ya se había reconocido a quienes participaron en esa factura
 
-CREATE OR ALTER TRIGGER trg_recupero_devolucion
-ON factura
+CREATE OR ALTER TRIGGER comisiones_schema.trg_recupero_devolucion
+ON comisiones_schema.factura
 AFTER UPDATE
 AS
 BEGIN
@@ -110,106 +113,109 @@ BEGIN
     IF NOT UPDATE(situacion)
         RETURN;
 
-    WITH FacturasAnuladas AS (
-        SELECT
-            i.numero AS numero_factura,
-            CAST(i.fecha_emision AS DATE) AS fecha_ref,
-            SUM(df.monto) AS total_factura,
-            SUM(df.cantidad) AS total_cantidad
-        FROM inserted i
-        INNER JOIN deleted d ON i.numero = d.numero
-        INNER JOIN detalle_factura df ON i.numero = df.numero_factura
-        WHERE d.situacion = 'cobrada'
-          AND i.situacion = 'anulada'
-        GROUP BY i.numero, CAST(i.fecha_emision AS DATE)
-    ),
-    RetraccionVendedores AS (
-        SELECT
-            fa.numero_factura,
-            fa.fecha_ref,
-            pf.id_vendedor,
-            CASE
-                WHEN pc.base IN ('ingreso', 'margen')
-                    THEN fa.total_factura * (pf.porcentaje / 100.0) * (pc.tasa / 100.0)
-                WHEN pc.base = 'cantidad'
-                    THEN fa.total_cantidad * (pf.porcentaje / 100.0) * pc.tasa
-                ELSE 0
-            END AS comision_a_retraer
-        FROM FacturasAnuladas fa
-        INNER JOIN participacion_factura pf ON fa.numero_factura = pf.numero_factura
-        CROSS APPLY (
-            SELECT TOP 1 apv.id_plan
-            FROM asignacion_plan_vendedor apv
-            WHERE apv.id_vendedor = pf.id_vendedor
-              AND apv.id_rol = pf.id_rol
-              AND apv.fecha_desde <= fa.fecha_ref
-            ORDER BY apv.fecha_desde DESC
-        ) plan_vigente
-        INNER JOIN plan_comision pc ON plan_vigente.id_plan = pc.codigo
-        WHERE pc.admite_descuentos = 1
-    )
-    UPDATE cc
-    SET cc.monto_ventas_propias = cc.monto_ventas_propias -agrupado.total_retraer
-    FROM calculo_comision cc
-    INNER JOIN (
-        SELECT
-            p.id_periodo,
-            rv.id_vendedor AS id_persona,
-            SUM(rv.comision_a_retraer) AS total_retraer
-        FROM RetraccionVendedores rv
-        INNER JOIN periodo p ON rv.fecha_ref BETWEEN p.fecha_inicio AND p.fecha_cierre
-        GROUP BY p.id_periodo, rv.id_vendedor
-    ) agrupado ON cc.id_periodo = agrupado.id_periodo
-              AND cc.id_persona = agrupado.id_persona;
+    SELECT
+        pf.id_vendedor,
+        CAST(d.fecha_emision AS DATE) AS fecha_venta,
+        CAST(d.fecha_cobro AS DATE) AS fecha_cobro,
+        CAST(CASE WHEN pc.base = 'cantidad'
+                  THEN comisiones_schema.fn_base_comisionable(pf.numero_factura, pc.codigo) * pc.tasa
+                  ELSE comisiones_schema.fn_base_comisionable(pf.numero_factura, pc.codigo) * pc.tasa / 100
+             END * pf.porcentaje / 100 AS DECIMAL(12,2)) AS comision
+    INTO #retraer
+    FROM inserted AS i
+    INNER JOIN deleted AS d ON d.numero = i.numero
+    INNER JOIN participacion_factura AS pf ON pf.numero_factura = i.numero
+    CROSS APPLY (
+        SELECT TOP 1 apv.id_plan
+        FROM asignacion_plan_vendedor AS apv
+        WHERE apv.id_vendedor = pf.id_vendedor
+          AND apv.id_rol = pf.id_rol
+          AND apv.fecha_desde <= CAST(d.fecha_emision AS DATE)
+        ORDER BY apv.fecha_desde DESC
+    ) AS plan_vigente
+    INNER JOIN plan_comision AS pc ON pc.codigo = plan_vigente.id_plan
+    WHERE d.situacion = 'cobrada'
+      AND i.situacion = 'anulada'
+      AND pc.admite_descuentos = 1;
 
-    WITH FacturasAnuladas AS (
-        SELECT
-            i.numero AS numero_factura,
-            CAST(i.fecha_emision AS DATE) AS fecha_ref,
-            SUM(df.monto) AS total_factura,
-            SUM(df.cantidad) AS total_cantidad
-        FROM inserted i
-        INNER JOIN deleted d ON i.numero = d.numero
-        INNER JOIN detalle_factura df ON i.numero = df.numero_factura
-        WHERE d.situacion = 'cobrada'
-          AND i.situacion = 'anulada'
-        GROUP BY i.numero, CAST(i.fecha_emision AS DATE)
-    ),
-    RetraccionSupervisores AS (
-        SELECT
-            p.id_periodo,
-            ha.id_supervisor AS id_persona,
-            SUM(
-                (CASE
-                    WHEN pc.base IN ('ingreso', 'margen')
-                        THEN fa.total_factura * (pf.porcentaje / 100.0) * (pc.tasa / 100.0)
-                    WHEN pc.base = 'cantidad'
-                        THEN fa.total_cantidad * (pf.porcentaje / 100.0) * pc.tasa
-                    ELSE 0
-                END) * (ha.porcentaje_reconocimiento / 100.0)
-            ) AS total_retraer_sup
-        FROM FacturasAnuladas fa
-        INNER JOIN participacion_factura pf ON fa.numero_factura = pf.numero_factura
-        CROSS APPLY (
-            SELECT TOP 1 apv.id_plan
-            FROM asignacion_plan_vendedor apv
-            WHERE apv.id_vendedor = pf.id_vendedor
-              AND apv.id_rol = pf.id_rol
-              AND apv.fecha_desde <= fa.fecha_ref
-            ORDER BY apv.fecha_desde DESC
-        ) plan_vigente
-        INNER JOIN plan_comision pc ON plan_vigente.id_plan = pc.codigo
-        INNER JOIN historial_asignacion ha ON pf.id_vendedor = ha.id_vendedor
-            AND fa.fecha_ref >= ha.fecha_desde
-            AND (ha.fecha_hasta IS NULL OR fa.fecha_ref <= ha.fecha_hasta)
-        INNER JOIN periodo p ON fa.fecha_ref BETWEEN p.fecha_inicio AND p.fecha_cierre
-        WHERE pc.admite_descuentos = 1
-        GROUP BY p.id_periodo, ha.id_supervisor
-    )
+    IF NOT EXISTS (SELECT 1 FROM #retraer)
+        RETURN;
+
     UPDATE cc
-    SET cc.monto_supervision = cc.monto_supervision - rs.total_retraer_sup
-    FROM calculo_comision cc
-    INNER JOIN RetraccionSupervisores rs ON cc.id_periodo = rs.id_periodo
-                                        AND cc.id_persona = rs.id_persona;
+    SET cc.monto_ventas_propias = CASE WHEN cc.monto_ventas_propias > r.total
+                                       THEN cc.monto_ventas_propias - r.total ELSE 0 END
+    FROM calculo_comision AS cc
+    INNER JOIN (
+        SELECT p.id_periodo, r.id_vendedor AS id_persona, SUM(r.comision) AS total
+        FROM #retraer AS r
+        INNER JOIN periodo AS p ON r.fecha_cobro BETWEEN p.fecha_inicio AND p.fecha_cierre
+        GROUP BY p.id_periodo, r.id_vendedor
+    ) AS r ON r.id_periodo = cc.id_periodo AND r.id_persona = cc.id_persona;
+
+    UPDATE cc
+    SET cc.monto_supervision = CASE WHEN cc.monto_supervision > s.total
+                                    THEN cc.monto_supervision - s.total ELSE 0 END
+    FROM calculo_comision AS cc
+    INNER JOIN (
+        SELECT p.id_periodo, ha.id_supervisor AS id_persona,
+               SUM(CAST(r.comision * ha.porcentaje_reconocimiento / 100 AS DECIMAL(12,2))) AS total
+        FROM #retraer AS r
+        INNER JOIN historial_asignacion AS ha
+            ON ha.id_vendedor = r.id_vendedor
+           AND r.fecha_venta >= ha.fecha_desde
+           AND (ha.fecha_hasta IS NULL OR r.fecha_venta <= ha.fecha_hasta)
+        INNER JOIN periodo AS p ON r.fecha_cobro BETWEEN p.fecha_inicio AND p.fecha_cierre
+        GROUP BY p.id_periodo, ha.id_supervisor
+    ) AS s ON s.id_periodo = cc.id_periodo AND s.id_persona = cc.id_persona;
+END;
+GO
+
+-- 4. Solo las personas activas pueden incorporarse como vendedores en nuevas facturas
+
+CREATE OR ALTER TRIGGER comisiones_schema.trg_participacion_vendedor_activo
+ON comisiones_schema.participacion_factura
+AFTER INSERT, UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF EXISTS (
+        SELECT 1
+        FROM inserted AS i
+        INNER JOIN persona AS p ON p.id_persona = i.id_vendedor
+        WHERE p.estado = 0
+          AND NOT EXISTS (SELECT 1 FROM deleted AS d
+                          WHERE d.numero_factura = i.numero_factura AND d.id_vendedor = i.id_vendedor)
+    )
+    BEGIN
+        RAISERROR ('Solo las personas activas pueden incorporarse como vendedores en nuevas facturas.', 16, 1);
+        ROLLBACK TRANSACTION;
+        RETURN;
+    END
+END;
+GO
+
+-- 5. Solo las personas activas pueden recibir nuevas asignaciones de plan
+
+CREATE OR ALTER TRIGGER comisiones_schema.trg_asignacion_vendedor_activo
+ON comisiones_schema.asignacion_plan_vendedor
+AFTER INSERT, UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF EXISTS (
+        SELECT 1
+        FROM inserted AS i
+        INNER JOIN persona AS p ON p.id_persona = i.id_vendedor
+        WHERE p.estado = 0
+          AND NOT EXISTS (SELECT 1 FROM deleted AS d
+                          WHERE d.id_vendedor = i.id_vendedor AND d.id_rol = i.id_rol AND d.fecha_desde = i.fecha_desde)
+    )
+    BEGIN
+        RAISERROR ('Solo las personas activas pueden recibir nuevas asignaciones de plan.', 16, 1);
+        ROLLBACK TRANSACTION;
+        RETURN;
+    END
 END;
 GO

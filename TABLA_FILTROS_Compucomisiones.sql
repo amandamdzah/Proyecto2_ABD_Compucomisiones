@@ -1,7 +1,7 @@
 USE COMPUCOMISIONES;
 GO
 
-CREATE TABLE filtro_plan (
+CREATE TABLE comisiones_schema.filtro_plan (
     id_plan INT NOT NULL,
     orden INT NOT NULL,
     tipo_filtro VARCHAR(20) NOT NULL,
@@ -16,7 +16,7 @@ CREATE TABLE filtro_plan (
         (tipo_filtro = 'producto' AND codigo_producto IS NOT NULL AND categoria IS NULL AND motivo IS NULL)
         OR (tipo_filtro = 'categoria' AND categoria IS NOT NULL AND codigo_producto IS NULL AND motivo IS NULL)
         OR (tipo_filtro = 'motivo' AND motivo IS NOT NULL AND codigo_producto IS NULL AND categoria IS NULL)),
-    CONSTRAINT fk_filtro_plan FOREIGN KEY (id_plan) REFERENCES plan_comision(codigo) ON DELETE CASCADE,
-    CONSTRAINT fk_filtro_producto FOREIGN KEY (codigo_producto) REFERENCES producto(codigo)
+    CONSTRAINT fk_filtro_plan FOREIGN KEY (id_plan) REFERENCES comisiones_schema.plan_comision(codigo) ON DELETE CASCADE,
+    CONSTRAINT fk_filtro_producto FOREIGN KEY (codigo_producto) REFERENCES comisiones_schema.producto(codigo)
 ) ON [FG_Tablas];
 GO

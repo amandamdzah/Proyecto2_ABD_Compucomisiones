@@ -1,0 +1,20 @@
+Orden de ejecucion de los scripts (en SSMS, con un usuario sysadmin):
+
+Primero los de creacion, en este orden:
+1. Filegroups_COMPUCOMISIONES.sql
+2. DDL_Compucomisiones.sql (crea tambien el esquema comisiones_schema)
+3. TABLA_FILTROS_Compucomisiones.sql
+4. RESTRICCIONES_Compucomisiones.sql
+5. Indices_compucomisiones.sql
+
+Despues, en cualquier orden:
+- FUNCION_FILTROS_Compucomisiones.sql
+- TRIGGERS_Compucomisiones.sql
+- PROCEDIMIENTO_PAGOS_Compucomisiones.sql
+- vista_compucomiones.sql
+- INSERTS_Compucomisiones.sql
+- roles.sql
+- BACKUP_Compucomisiones.sql
+
+Todo queda en el esquema comisiones_schema, asi que con un usuario sysadmin las consultas
+se hacen con el esquema adelante, por ejemplo: SELECT * FROM comisiones_schema.persona;
